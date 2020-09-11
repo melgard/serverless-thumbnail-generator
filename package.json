@@ -1,0 +1,29 @@
+{
+  "name": "thumbnail-generator",
+  "version": "1.0.0",
+  "description": "Serverless webpack example using Typescript",
+  "main": "handler.js",
+  "scripts": {
+    "deploy": "cross-env AWS_PROFILE=profile serverless deploy --profile profile",
+    "remove": "cross-env AWS_PROFILE=profile serverless remove --profile profile"
+  },
+  "dependencies": {
+    "gm": "^1.23.1",
+    "aws-sdk": "^2.747.0",
+    "source-map-support": "^0.5.10"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.17",
+    "@types/node": "^10.12.18",
+    "serverless-iam-roles-per-function": "^2.0.2",
+    "cross-env": "^7.0.2",
+    "fork-ts-checker-webpack-plugin": "^3.0.1",
+    "serverless-webpack": "^5.2.0",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.2.4",
+    "webpack": "^4.29.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "author": "David Agustin Melgar",
+  "license": "MIT"
+}

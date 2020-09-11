@@ -1,0 +1,62 @@
+service:
+  name: thumbnail-generator
+
+custom:
+  settings:
+    REGION: ${opt:region, 'us-east-1'}
+    STAGE: ${opt:stage, 'dev'}
+    GRAPHICS_MAGICK: ${opt:graphicsmagick, 'arn:aws:lambda:us-east-1:175033217214:layer:graphicsmagick:2'}
+    BUCKET_NAME: ${opt:stage, 'ar.com.midomain.resourcebucket'}
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules:
+      forceExclude:
+        - aws-sdk
+      packagePath: package.json
+
+package:
+  include:
+    - /src/**
+  exclude:
+    - node_modules/**
+    - tmp/**
+    - .git/**
+    - .idea/**
+    - .package.json
+    - .package-lock.json
+    - .gitignore
+    - bitbucket-pipelines.yml
+  individually: true
+
+plugins:
+  - serverless-webpack
+  - serverless-iam-roles-per-function
+  
+provider:
+  name: aws
+  stage: ${self:custom.settings.STAGE}
+  runtime: nodejs10.x
+  region: ${self:custom.settings.REGION}
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+functions:
+  thumbnailGenerator:
+    handler: src/handler.thumbnailGenerator
+    memorySize: 1024
+    timeout: 60
+    iamRoleStatementsName: lambda-thumbnail-generator-execution-role
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - 's3:Get*'
+          - 's3:List*'
+          - 's3:Put*'
+        Resource:
+          Fn::Join: [ "/", [ "arn:aws:s3:::${self:custom.settings.BUCKET_NAME}", "*" ] ]
+    events:
+      - s3:
+          bucket: ${self:custom.settings.BUCKET_NAME}
+          event: s3:ObjectCreated:Put
+    layers:
+      - ${self:custom.settings.GRAPHICS_MAGICK}
